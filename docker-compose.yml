@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # Main consumer processor service
+  consumer-processor:
+    build:
+      context: ./services/consumer-processor
+      dockerfile: Dockerfile
+    container_name: consumer-processor
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - entity-queue-producer
+    networks:
+      - godot-pipeline-network
+    restart: unless-stopped
+
+  # CRDT Runner service
+  consumer-processor-crdt:
+    build:
+      context: ./services/consumer-processor
+      dockerfile: ./dependencies/crdt-runner/Dockerfile
+    container_name: consumer-processor-crdt
+    environment:
+      - NODE_ENV=production
+      - MODE=crdt-runner
+    networks:
+      - godot-pipeline-network
+    restart: unless-stopped
+
+  # Godot Asset Optimizer service
+  consumer-processor-optimizer:
+    build:
+      context: ./services/consumer-processor
+      dockerfile: ./dependencies/godot-asset-optimizer-project/Dockerfile
+    container_name: consumer-processor-optimizer
+    environment:
+      - NODE_ENV=production
+      - MODE=asset-optimizer
+    volumes:
+      - godot-assets:/tmp/godot-assets
+    networks:
+      - godot-pipeline-network
+    restart: unless-stopped
+
+  # Godot Runner service
+  consumer-processor-godot:
+    build:
+      context: ./services/consumer-processor
+      dockerfile: ./dependencies/godot-runner/Dockerfile
+    container_name: consumer-processor-godot
+    environment:
+      - NODE_ENV=production
+      - MODE=godot-runner
+    volumes:
+      - godot-projects:/tmp/godot-projects
+    networks:
+      - godot-pipeline-network
+    restart: unless-stopped
+
+  # Entity queue producer service
+  entity-queue-producer:
+    build:
+      context: ./services/entity-queue-producer
+      dockerfile: Dockerfile
+    container_name: entity-queue-producer
+    environment:
+      - NODE_ENV=production
+      - PORT=8081
+    ports:
+      - "8081:8081"
+    networks:
+      - godot-pipeline-network
+    restart: unless-stopped
+
+volumes:
+  godot-assets:
+  godot-projects:
+
+networks:
+  godot-pipeline-network:
+    driver: bridge

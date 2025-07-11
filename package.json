@@ -1,0 +1,28 @@
+{
+  "name": "godot-server-pipeline",
+  "version": "1.0.0",
+  "description": "Godot Server Pipeline - Monorepo for consumer-processor, entity-queue-producer, and status-service",
+  "private": true,
+  "workspaces": [
+    "services/*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "test": "yarn workspaces run test",
+    "lint:check": "yarn workspaces run lint:check",
+    "lint:fix": "yarn workspaces run lint:fix",
+    "start:consumer-processor": "yarn workspace consumer-processor start",
+    "start:entity-queue-producer": "yarn workspace entity-queue-producer start",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "swarm:deploy": "docker stack deploy -c docker-stack.yml godot-pipeline",
+    "swarm:remove": "docker stack rm godot-pipeline"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

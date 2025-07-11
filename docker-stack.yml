@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  # Godot Asset Optimizer service - 6 replicas
+  consumer-processor-optimizer:
+    image: godot-pipeline/consumer-processor-optimizer:latest
+    deploy:
+      replicas: 6
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 2
+        delay: 10s
+        failure_action: rollback
+      placement:
+        constraints:
+          - node.role == worker
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - MODE=asset-optimizer
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+      - SQS_QUEUE_URL=${SQS_QUEUE_URL}
+      - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
+      - COMMIT_HASH=${COMMIT_HASH:-local}
+      - CURRENT_VERSION=${CURRENT_VERSION:-Unknown}
+    volumes:
+      - godot-assets:/tmp/godot-assets
+    networks:
+      - godot-pipeline-network
+
+  # Entity queue producer service
+  entity-queue-producer:
+    image: godot-pipeline/entity-queue-producer:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      placement:
+        constraints:
+          - node.role == worker
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${ENTITY_QUEUE_PORT:-8081}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
+      - CATALYST_STORAGE_URL=${CATALYST_STORAGE_URL}
+      - SNAPSHOTS_FETCHER_URL=${SNAPSHOTS_FETCHER_URL}
+    ports:
+      - "${ENTITY_QUEUE_PORT:-8081}:${ENTITY_QUEUE_PORT:-8081}"
+    networks:
+      - godot-pipeline-network
+
+  # Status service
+  status-service:
+    image: godot-pipeline/status-service:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      placement:
+        constraints:
+          - node.role == worker
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${STATUS_SERVICE_PORT:-8082}
+    ports:
+      - "${STATUS_SERVICE_PORT:-8082}:${STATUS_SERVICE_PORT:-8082}"
+    networks:
+      - godot-pipeline-network
+
+volumes:
+  godot-assets:
+  godot-projects:
+
+networks:
+  godot-pipeline-network:
+    driver: overlay
+    attachable: true
+
+configs:
+  # Add configuration files here if needed
+  # Example:
+  # app-config:
+  #   file: ./configs/app.yml
+
+secrets:
+  # Add secrets here if needed
+  # Example:
+  # db-password:
+  #   external: true
