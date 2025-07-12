@@ -11,15 +11,15 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
 # Copy package files
-COPY package*.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install
 
 # Build the app
 COPY . .
 RUN npm run build
 
 # Remove dev dependencies
-RUN npm ci --only=production
+RUN npm install --only=production
 
 ########################## END OF BUILD STAGE ##########################
 
