@@ -14,14 +14,38 @@ Set the following secrets in your GitHub repository (`Settings` → `Secrets and
 
 ### Required Secrets
 
+#### AWS Services (SQS/SNS)
 | Secret Name | Description | Example |
 |-------------|-------------|---------|
-| `AWS_REGION` | AWS region for services | `us-east-1` |
-| `AWS_ACCESS_KEY_ID` | AWS access key ID | `AKIAIOSFODNN7EXAMPLE` |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret access key | `wJalrXUtnFEMI/K7MDENG/...` |
-| `S3_BUCKET` | S3 bucket for asset storage | `my-godot-assets-bucket` |
-| `SQS_QUEUE_URL` | SQS queue URL for processing | `https://sqs.us-east-1.amazonaws.com/123456789012/my-queue` |
-| `SNS_TOPIC_ARN` | SNS topic ARN for notifications | `arn:aws:sns:us-east-1:123456789012:my-topic` |
+| `AWS_REGION` | AWS region for SQS/SNS services | `us-east-1` |
+| `AWS_ACCESS_KEY_ID` | AWS access key ID for SQS/SNS | `AKIAIOSFODNN7EXAMPLE` |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret access key for SQS/SNS | `wJalrXUtnFEMI/K7MDENG/...` |
+
+#### SQS Queues
+| Secret Name | Description | Example |
+|-------------|-------------|---------|
+| `SQS_QUEUE_URL` | Main SQS queue URL for processing | `https://sqs.us-east-1.amazonaws.com/123456789012/my-queue` |
+| `PRIORITY_SQS_QUEUE_URL` | Priority SQS queue URL | `https://sqs.us-east-1.amazonaws.com/123456789012/priority-queue` |
+
+#### SNS Topics
+| Secret Name | Description | Example |
+|-------------|-------------|---------|
+| `SNS_TOPIC_ARN` | SNS topic ARN for consumer notifications | `arn:aws:sns:us-east-1:123456789012:my-topic` |
+| `SCENE_SNS_ARN` | SNS topic ARN for scene deployments | `arn:aws:sns:us-east-1:123456789012:scene-topic` |
+| `PRIORITY_SCENE_SNS_ARN` | SNS topic ARN for priority scenes | `arn:aws:sns:us-east-1:123456789012:priority-scene-topic` |
+| `WEARABLE_EMOTES_SNS` | SNS topic ARN for wearables/emotes | `arn:aws:sns:us-east-1:123456789012:wearable-emotes-topic` |
+
+#### CloudFlare R2 Storage (S3-compatible)
+| Secret Name | Description | Example |
+|-------------|-------------|---------| 
+| `S3_BUCKET` | S3/R2 bucket for asset storage | `my-godot-assets-bucket` |
+| `S3_ACCESS_KEY_ID` | S3/R2 storage access key ID | `your-r2-access-key` |
+| `S3_SECRET_ACCESS_KEY` | S3/R2 storage secret access key | `your-r2-secret-key` |
+| `S3_ENDPOINT` | S3/R2 endpoint URL (for R2) | `https://accountid.r2.cloudflarestorage.com` |
+
+#### Decentraland Services
+| Secret Name | Description | Example |
+|-------------|-------------|---------|
 | `CATALYST_STORAGE_URL` | Catalyst storage service URL | `https://catalyst-storage.decentraland.org` |
 | `SNAPSHOTS_FETCHER_URL` | Snapshots fetcher service URL | `https://snapshots-fetcher.decentraland.org` |
 

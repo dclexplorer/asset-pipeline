@@ -4,21 +4,36 @@ This document lists all environment variables required for deploying the Godot S
 
 ## Required Environment Variables
 
-### AWS Configuration
-These variables are required for AWS services integration:
+### AWS Configuration (SQS/SNS)
+These variables are required for AWS SQS/SNS services:
 
 | Variable | Description | Required For | Example |
-|----------|-------------|--------------|---------|
-| `AWS_REGION` | AWS region for services | All services | `us-east-1` |
-| `AWS_ACCESS_KEY_ID` | AWS access key ID | All services | `AKIAIOSFODNN7EXAMPLE` |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret access key | All services | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
+|----------|-------------|--------------|---------| 
+| `AWS_REGION` | AWS region for SQS/SNS services | All services | `us-east-1` |
+| `AWS_ACCESS_KEY_ID` | AWS access key ID for SQS/SNS | All services | `AKIAIOSFODNN7EXAMPLE` |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret access key for SQS/SNS | All services | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
 
-### AWS Service-Specific
+### S3-Compatible Storage (CloudFlare R2)
 | Variable | Description | Required For | Example |
 |----------|-------------|--------------|---------|
-| `S3_BUCKET` | S3 bucket name for asset storage | consumer-processor-optimizer | `my-godot-assets-bucket` |
-| `SQS_QUEUE_URL` | SQS queue URL for processing | consumer-processor-optimizer | `https://sqs.us-east-1.amazonaws.com/123456789012/my-queue` |
-| `SNS_TOPIC_ARN` | SNS topic ARN for notifications | entity-queue-producer, consumer-processor-optimizer | `arn:aws:sns:us-east-1:123456789012:my-topic` |
+| `S3_BUCKET` | S3/R2 bucket name for asset storage | consumer-processor-optimizer | `my-godot-assets-bucket` |
+| `S3_ACCESS_KEY_ID` | S3/R2 storage access key ID | consumer-processor-optimizer | `your-r2-access-key` |
+| `S3_SECRET_ACCESS_KEY` | S3/R2 storage secret access key | consumer-processor-optimizer | `your-r2-secret-key` |
+| `S3_ENDPOINT` | S3/R2 endpoint URL (for R2) | consumer-processor-optimizer | `https://accountid.r2.cloudflarestorage.com` |
+
+### SQS Queues
+| Variable | Description | Required For | Example |
+|----------|-------------|--------------|---------|
+| `SQS_QUEUE_URL` | Main SQS queue URL (mapped to TASK_QUEUE) | consumer-processor-optimizer | `https://sqs.us-east-1.amazonaws.com/123456789012/my-queue` |
+| `PRIORITY_SQS_QUEUE_URL` | Priority SQS queue URL (mapped to PRIORITY_TASK_QUEUE) | consumer-processor-optimizer | `https://sqs.us-east-1.amazonaws.com/123456789012/priority-queue` |
+
+### SNS Topics
+| Variable | Description | Required For | Example |
+|----------|-------------|--------------|---------|
+| `SNS_TOPIC_ARN` | SNS topic ARN for consumer notifications (mapped to SNS_ARN) | consumer-processor-optimizer | `arn:aws:sns:us-east-1:123456789012:my-topic` |
+| `SCENE_SNS_ARN` | SNS topic ARN for scene deployments | entity-queue-producer | `arn:aws:sns:us-east-1:123456789012:scene-topic` |
+| `PRIORITY_SCENE_SNS_ARN` | SNS topic ARN for priority scenes | entity-queue-producer | `arn:aws:sns:us-east-1:123456789012:priority-scene-topic` |
+| `WEARABLE_EMOTES_SNS` | SNS topic ARN for wearables/emotes | entity-queue-producer | `arn:aws:sns:us-east-1:123456789012:wearable-emotes-topic` |
 
 ### Service URLs
 | Variable | Description | Required For | Example |
@@ -46,9 +61,12 @@ These variables are required for AWS services integration:
 NODE_ENV=production
 MODE=asset-optimizer
 AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-S3_BUCKET=your-assets-bucket
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+S3_BUCKET=your-r2-bucket
+S3_ACCESS_KEY_ID=your-r2-access-key
+S3_SECRET_ACCESS_KEY=your-r2-secret-key
+S3_ENDPOINT=https://accountid.r2.cloudflarestorage.com
 SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/123456789012/your-queue
 SNS_TOPIC_ARN=arn:aws:sns:us-east-1:123456789012:your-topic
 COMMIT_HASH=abc123def
@@ -82,9 +100,12 @@ Create a `.env` file in the project root:
 # .env
 NODE_ENV=production
 AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your-access-key-id
-AWS_SECRET_ACCESS_KEY=your-secret-access-key
-S3_BUCKET=your-s3-bucket
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+S3_BUCKET=your-r2-bucket
+S3_ACCESS_KEY_ID=your-r2-access-key-id
+S3_SECRET_ACCESS_KEY=your-r2-secret-access-key
+S3_ENDPOINT=https://accountid.r2.cloudflarestorage.com
 SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/123456789012/your-queue
 SNS_TOPIC_ARN=arn:aws:sns:us-east-1:123456789012:your-topic
 CATALYST_STORAGE_URL=https://catalyst-storage.decentraland.org
@@ -103,6 +124,9 @@ For GitHub Actions deployment, set these as repository secrets:
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 - `S3_BUCKET`
+- `S3_ACCESS_KEY_ID`
+- `S3_SECRET_ACCESS_KEY`
+- `S3_ENDPOINT`
 - `SQS_QUEUE_URL`
 - `SNS_TOPIC_ARN`
 - `CATALYST_STORAGE_URL`

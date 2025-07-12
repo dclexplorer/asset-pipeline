@@ -125,7 +125,7 @@ export async function initComponents(): Promise<AppComponents> {
     ? createSqsAdapter<DeploymentToSqs>({ logs, metrics }, { queueUrl: sqsQueue, priorityQueueUrl: prioritySqsQueue })
     : createMemoryQueueAdapter<DeploymentToSqs>({ logs, metrics }, { queueName: 'ConversionTaskQueue' })
 
-  const bucket = await config.getString('BUCKET')
+  const bucket = await config.getString('S3_BUCKET')
   const s3Endpoint = await config.getString('S3_ENDPOINT')
   const prefixVersion = await config.getString('S3_PREFIX')
 
