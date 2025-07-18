@@ -21,9 +21,8 @@ COPY . /app
 COPY dependencies/godot-runner/.env .env
 COPY dependencies/godot-runner/godot-entrypoint.sh godot-entrypoint.sh
 
-RUN npm i --global yarn
-RUN yarn --frozen-lockfile
-RUN yarn build
+RUN npm ci
+RUN npm run build
 
 ENV NODE_ENV production
 

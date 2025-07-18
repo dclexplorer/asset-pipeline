@@ -24,29 +24,29 @@ This is a monorepo for Decentraland's Godot-based asset processing pipeline. It 
 - AWS services (S3 for asset storage, SQS for queues, SNS for notifications)
 - CloudFlare R2 (S3-compatible storage) for asset storage
 - Godot game engine for asset processing
-- Yarn workspaces for monorepo management
+- npm workspaces for monorepo management
 
 ## Essential Development Commands
 
 ### Build and Test
 ```bash
 # Build all services
-yarn build
+npm run build
 
 # Run all tests
-yarn test
+npm test
 
 # Test specific service
-yarn workspace consumer-processor test
-yarn workspace entity-queue-producer test
-yarn workspace status-service test
+npm run test --workspace=consumer-processor
+npm run test --workspace=entity-queue-producer
+npm run test --workspace=status-service
 
 # Run single test file
-yarn workspace consumer-processor test path/to/test.spec.ts
+npm run test --workspace=consumer-processor path/to/test.spec.ts
 
 # Lint check/fix
-yarn lint:check
-yarn lint:fix
+npm run lint:check
+npm run lint:fix
 ```
 
 ### Local Development
@@ -166,8 +166,8 @@ The build system automatically detects CPU architecture:
 1. Identify which service needs modification
 2. Use `./dev.sh <service> --shell` to explore the container
 3. Make changes and test locally with `./dev.sh <service> --build`
-4. Run tests: `yarn workspace <service-name> test`
-5. Check linting: `yarn lint:check`
+4. Run tests: `npm run test --workspace=<service-name>`
+5. Check linting: `npm run lint:check`
 
 ### Debugging Issues
 1. Check logs: `./dev-helper.sh logs <service>`

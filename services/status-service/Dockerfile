@@ -12,14 +12,15 @@ RUN chmod +x /tini
 
 # Copy package files
 COPY package.json ./
-RUN npm install
+COPY package-lock.json ./
+RUN npm ci
 
 # Build the app
 COPY . .
 RUN npm run build
 
 # Remove dev dependencies
-RUN npm install --only=production
+RUN npm ci --production
 
 ########################## END OF BUILD STAGE ##########################
 

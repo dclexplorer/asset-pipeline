@@ -52,12 +52,7 @@ setup() {
     
     # Install dependencies for all services
     echo -e "${YELLOW}Installing dependencies...${NC}"
-    if command -v yarn > /dev/null; then
-        yarn install
-    else
-        echo -e "${YELLOW}Yarn not found, using npm...${NC}"
-        npm install
-    fi
+    npm install
     
     # Create local directories for volumes
     echo -e "${YELLOW}Creating local directories...${NC}"

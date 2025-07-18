@@ -7,12 +7,12 @@
     "services/*"
   ],
   "scripts": {
-    "build": "yarn workspaces run build",
-    "test": "yarn workspaces run test",
-    "lint:check": "yarn workspaces run lint:check",
-    "lint:fix": "yarn workspaces run lint:fix",
-    "start:consumer-processor": "yarn workspace consumer-processor start",
-    "start:entity-queue-producer": "yarn workspace entity-queue-producer start",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint:check": "npm run lint:check --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces", 
+    "start:consumer-processor": "npm run start --workspace=consumer-processor",
+    "start:entity-queue-producer": "npm run start --workspace=entity-queue-producer",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up",
     "docker:down": "docker-compose down",

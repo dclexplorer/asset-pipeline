@@ -151,10 +151,10 @@ godot-server-pipeline/
 
 ```bash
 # Consumer processor
-yarn workspace consumer-processor start
+npm run start --workspace=consumer-processor
 
 # Entity queue producer
-yarn workspace entity-queue-producer start
+npm run start --workspace=entity-queue-producer
 ```
 
 ## Environment Variables

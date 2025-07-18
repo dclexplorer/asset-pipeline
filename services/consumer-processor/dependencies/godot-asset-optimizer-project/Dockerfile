@@ -46,9 +46,8 @@ COPY . /app
 # TEMP
 COPY dependencies/godot-asset-optimizer-project/entrypoint.sh /app/entrypoint.sh
 
-RUN npm i --global yarn
-RUN yarn --frozen-lockfile
-RUN yarn build
+RUN npm ci
+RUN npm run build
 
 ENV NODE_ENV=production
 
