@@ -216,6 +216,34 @@ jobs:
               networks:
                 - godot-pipeline-network
           
+            # Docker Swarm Visualizer
+            visualizer:
+              image: dockersamples/visualizer:latest
+              deploy:
+                replicas: 1
+                restart_policy:
+                  condition: on-failure
+                  delay: 5s
+                  max_attempts: 3
+                placement:
+                  constraints:
+                    - node.role == manager
+                resources:
+                  limits:
+                    cpus: '0.5'
+                    memory: 256M
+                  reservations:
+                    cpus: '0.1'
+                    memory: 128M
+              ports:
+                - "${{ secrets.VISUALIZER_PORT || '8088' }}:8080"
+              volumes:
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+              networks:
+                - godot-pipeline-network
+              environment:
+                - CTX_ROOT=/
+          
           volumes:
             godot-assets:
           

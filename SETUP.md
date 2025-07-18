@@ -106,6 +106,7 @@ export SNAPSHOTS_FETCHER_URL=https://snapshots-fetcher.decentraland.org
 export NODE_ENV=production
 export ENTITY_QUEUE_PORT=8081
 export STATUS_SERVICE_PORT=8082
+export VISUALIZER_PORT=8088
 export COMMIT_HASH=$(git rev-parse HEAD)
 export CURRENT_VERSION=1.0.0
 ```
@@ -242,6 +243,23 @@ curl http://<SWARM-HOST>:8082/health
 # Get detailed status
 curl http://<SWARM-HOST>:8082/status
 ```
+
+### Docker Swarm Visualizer
+
+The stack includes a web-based visualizer for monitoring your Swarm cluster:
+
+```bash
+# Access the visualizer (default port 8088)
+http://<SWARM-HOST>:8088
+
+# The visualizer shows:
+# - All services in the stack
+# - Container distribution across nodes
+# - Service replica status
+# - Real-time updates when services scale or move
+```
+
+**Note**: The visualizer requires access to the Docker socket and runs only on manager nodes.
 
 ### Scaling Services
 

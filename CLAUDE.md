@@ -15,12 +15,14 @@ This is a monorepo for Decentraland's Godot-based asset processing pipeline. It 
   - Godot Runner: Executes Godot explorer
 - **entity-queue-producer**: Queue management service (port 8081)
 - **status-service**: Health monitoring service (port 8082)
+- **visualizer**: Docker Swarm visualizer web UI (port 8088) - shows service distribution across nodes
 
 ### Technology Stack
 - TypeScript/Node.js (v18+)
 - Docker & Docker Compose for local development
 - Docker Swarm for production deployment
 - AWS services (S3 for asset storage, SQS for queues, SNS for notifications)
+- CloudFlare R2 (S3-compatible storage) for asset storage
 - Godot game engine for asset processing
 - Yarn workspaces for monorepo management
 
@@ -37,6 +39,10 @@ yarn test
 # Test specific service
 yarn workspace consumer-processor test
 yarn workspace entity-queue-producer test
+yarn workspace status-service test
+
+# Run single test file
+yarn workspace consumer-processor test path/to/test.spec.ts
 
 # Lint check/fix
 yarn lint:check
@@ -58,6 +64,9 @@ yarn lint:fix
 
 # Open shell in service for debugging
 ./dev.sh consumer-processor-optimizer --shell
+
+# Run with custom environment file
+./dev.sh consumer-processor-optimizer --env .env.local
 ```
 
 #### Using dev-helper.sh shortcuts
@@ -88,6 +97,9 @@ docker-compose up
 
 # With rebuild
 docker-compose up --build
+
+# Run specific service
+docker-compose up consumer-processor-optimizer
 ```
 
 ### Production Deployment
@@ -97,6 +109,12 @@ docker-compose up --build
 
 # Check deployment
 docker stack ps godot-pipeline
+
+# View service logs
+docker service logs godot-pipeline_consumer-processor-optimizer
+
+# Access visualizer web UI
+# http://<swarm-manager-ip>:8088
 
 # Remove from Swarm
 ./scripts/remove-swarm.sh
@@ -109,22 +127,33 @@ docker stack ps godot-pipeline
 - Handles Godot asset optimization and processing
 - Key environment: `PROCESS_METHOD=godot_optimizer`
 - Default env file: `services/consumer-processor/.env.godot-optimizer`
+- Processes assets from SQS queue and stores results in S3/R2
 
 ### Entity Queue Producer
 - Manages entity queues and produces messages
 - Integrates with Decentraland's catalyst storage
-- Supports processing by entity ID, coordinates, or world names
+- Supports processing by:
+  - Entity ID: `/process-entity/{entityId}`
+  - Coordinates: `/process-by-coords?x1=-50&y1=-50&x2=50&y2=50`
+  - World names: `/process-world/{worldName}`
 - Default env file: `services/entity-queue-producer/.env`
+- Includes world-sync adapter for periodic world synchronization
 
 ### CRDT Runner
 - Processes scene operations for Decentraland
 - Located in: `services/consumer-processor/dependencies/crdt-runner/`
 - Has its own build and test scripts
+- Handles Conflict-free Replicated Data Type operations
+
+### Status Service
+- Health monitoring endpoint (port 8082)
+- Currently a minimal implementation
+- Future: Will provide centralized monitoring for all services
 
 ## AWS Integration Points
-- S3: Asset storage (configured via BUCKET environment variable)
-- SQS: Task queues (regular and priority queues)
-- SNS: Notifications (configured via SNS_TOPIC_ARN)
+- **S3/CloudFlare R2**: Asset storage (configured via S3_BUCKET, S3_ENDPOINT)
+- **SQS**: Task queues (regular via SQS_QUEUE_URL and priority via PRIORITY_SQS_QUEUE_URL)
+- **SNS**: Notifications (configured via SNS_TOPIC_ARN, SCENE_SNS_ARN, etc.)
 
 ## Architecture Awareness
 The build system automatically detects CPU architecture:
@@ -144,6 +173,7 @@ The build system automatically detects CPU architecture:
 1. Check logs: `./dev-helper.sh logs <service>`
 2. Open shell in container: `./dev.sh <service> --shell`
 3. Inside container: inspect files, check environment, run Node debugger
+4. Check health endpoints: `curl http://localhost:<port>/health`
 
 ### Environment Configuration
 Each service has default .env files. To customize:
@@ -151,9 +181,17 @@ Each service has default .env files. To customize:
 2. Edit the custom file
 3. Run with: `./dev.sh <service> --env .env.local`
 
+Environment precedence: process env vars > .env > .env.default
+
 ## Key File Locations
 - Service implementations: `services/*/src/`
 - Dockerfiles: `services/*/Dockerfile`
 - Environment configs: `services/*/.env*`
 - Deployment configs: `docker-compose.yml`, `docker-stack.yml`
 - Helper scripts: `dev.sh`, `dev-helper.sh`, `scripts/`
+- Documentation: `docs/`, `SETUP.md`
+
+## Service History
+- consumer-processor: Migrated from deployments-sse repository
+- entity-queue-producer: Migrated from deployments-to-sqs repository
+- Both services were unified into this monorepo for better management
