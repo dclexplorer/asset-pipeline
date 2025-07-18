@@ -27,7 +27,7 @@
         "@types/yargs": "^17.0.33",
         "@well-known-components/env-config-provider": "^1.2.0",
         "@well-known-components/fetch-component": "^2.0.2",
-        "@well-known-components/http-server": "^2.0.0",
+        "@well-known-components/http-server": "^1.1.1",
         "@well-known-components/interfaces": "^1.4.2",
         "protobufjs": "^7.2.5",
         "source-map": "^0.7.4",

@@ -39,12 +39,12 @@ export function createWorldSync(
         // Extracting scene IDs
         const sceneIds: string[] = data.data.flatMap((world: any) => world.scenes.map((scene: any) => scene.id))
         return sceneIds
-      } catch (error) {
+      } catch (error: any) {
         if (attempt === retries) {
-          logger.error('Error fetching scene IDs after all retries:', error)
+          logger.error('Error fetching scene IDs after all retries:', { error: error?.message || String(error) })
           throw new Error('Error fetching scene IDs: ' + error)
         }
-        logger.warn(`Error on attempt ${attempt}/${retries}, retrying...`, error)
+        logger.warn(`Error on attempt ${attempt}/${retries}, retrying...`, { error: error?.message || String(error) })
         await delay(attempt * 5000) // Exponential backoff
       }
     }
@@ -84,12 +84,12 @@ export function createWorldSync(
 
               logger.info('World deployed ' + sceneId)
             }
-          } catch (error) {
-            logger.error('Error deploying scene:' + sceneId)
+          } catch (error: any) {
+            logger.error('Error deploying scene:' + sceneId, { error: error?.message || String(error) })
           }
         }
-      } catch (error) {
-        logger.error('Error in world sync iteration:', error)
+      } catch (error: any) {
+        logger.error('Error in world sync iteration:', { error: error?.message || String(error) })
         // Continue the loop even if fetching fails
       }
 
